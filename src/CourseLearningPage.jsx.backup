@@ -1,0 +1,469 @@
+import React, { useState, useEffect } from 'react';
+import './CourseLearningPage.css';
+
+const CourseLearningPage = ({ onBackToDashboard }) => {
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [currentVideo, setCurrentVideo] = useState(0);
+  const [completedVideos, setCompletedVideos] = useState([0]);
+  const [completedAssignments, setCompletedAssignments] = useState([]);
+  const [completedQuizzes, setCompletedQuizzes] = useState([]);
+
+  useEffect(() => {
+    const savedCourse = localStorage.getItem('selected_course');
+    if (savedCourse) {
+      try {
+        const parsedCourse = JSON.parse(savedCourse);
+        setSelectedCourse(parsedCourse);
+      } catch (error) {
+        console.error('Error parsing saved course:', error);
+        const defaultCourse = {
+          name: "Maths with AI",
+          instructor: "22bmiti09@gmail.com",
+          image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop"
+        };
+        setSelectedCourse(defaultCourse);
+      }
+    } else {
+      const defaultCourse = {
+        name: "Maths with AI",
+        instructor: "22bmiti09@gmail.com",
+        image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop"
+      };
+      setSelectedCourse(defaultCourse);
+    }
+  }, []);
+
+  // Course content data - NPTEL style
+  const courseContent = {
+    videos: [
+      {
+        id: 1,
+        title: "Introduction to AI in Mathematics",
+        duration: "15:30",
+        url: "https://www.youtube.com/embed/airAruvnKBE"
+      },
+      {
+        id: 2,
+        title: "Linear Algebra Fundamentals",
+        duration: "22:45",
+        url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      },
+      {
+        id: 3,
+        title: "Calculus for Machine Learning",
+        duration: "18:20",
+        url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      },
+      {
+        id: 4,
+        title: "Probability & Statistics",
+        duration: "25:10",
+        url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      }
+    ],
+    assignments: [
+      {
+        id: 1,
+        title: "Assignment 1",
+        description: "Linear Algebra Problems",
+        deadline: "Dec 10, 2025",
+        marks: 100
+      },
+      {
+        id: 2,
+        title: "Assignment 2",
+        description: "Calculus Applications",
+        deadline: "Dec 20, 2025",
+        marks: 100
+      },
+      {
+        id: 3,
+        title: "Assignment 3",
+        description: "Probability Distributions",
+        deadline: "Jan 5, 2026",
+        marks: 100
+      }
+    ],
+    quizzes: [
+      {
+        id: 1,
+        title: "Week 1 Quiz",
+        timeLimit: "30 minutes",
+        marks: 50
+      },
+      {
+        id: 2,
+        title: "Week 2 Quiz",
+        timeLimit: "30 minutes",
+        marks: 50
+      },
+      {
+        id: 3,
+        title: "Week 3 Quiz",
+        timeLimit: "30 minutes",
+        marks: 50
+      }
+    ]
+  };
+
+  const totalVideos = courseContent.videos.length;
+  const totalAssignments = courseContent.assignments.length;
+  const completionPercentage = Math.round((completedVideos.length / totalVideos) * 100);
+
+  const handleVideoComplete = (videoId) => {
+    if (!completedVideos.includes(videoId)) {
+      setCompletedVideos([...completedVideos, videoId]);
+    }
+  };
+
+  const handleAssignmentStart = (assignmentId) => {
+    alert(`Starting Assignment ${assignmentId}`);
+  };
+
+  const handleQuizStart = (quizId) => {
+    alert(`Starting Quiz ${quizId}`);
+  };
+
+  if (!selectedCourse) {
+    return (
+      <div className="nptel-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading course...</p>
+      </div>
+    );
+  }
+          <div className="header-content">
+            <button className="back-btn-modern" onClick={onBackToDashboard}>
+              <span className="back-icon">←</span>
+              Back to Dashboard
+            </button>
+            <div className="course-info">
+              <h1>Loading Course...</h1>
+              <p>Please wait while we load the course content</p>
+            </div>
+          </div>
+        </div>
+        <div className="course-content">
+          <div className="loading" style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            fontSize: '1.5rem',
+            color: '#6b7280',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '2rem',
+            backdropFilter: 'blur(10px)'
+          }}>
+            🔄 Loading course content...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+
+  return (
+    <div className="nptel-course-page">
+      {/* NPTEL-Style Header */}
+      <header className="nptel-header">
+        <div className="nptel-header-inner">
+          <button className="nptel-back-btn" onClick={onBackToDashboard}>
+            <span className="back-arrow">←</span>
+            Back to Dashboard
+          </button>
+          <div className="nptel-course-title-section">
+            <h1 className="nptel-course-title">{selectedCourse.name}</h1>
+            <p className="nptel-instructor">by {selectedCourse.instructor}</p>
+          </div>
+        </div>
+        <div className="nptel-divider"></div>
+      </header>
+
+      {/* Main Content */}
+      <div className="nptel-content-wrapper">
+        {/* Course Progress Card */}
+        <div className="nptel-progress-card">
+          <div className="progress-card-header">
+            <span className="progress-icon">📊</span>
+            <h2>Course Progress</h2>
+          </div>
+          <div className="progress-stats-grid">
+            <div className="progress-stat-box">
+              <div className="stat-number">{totalVideos}</div>
+              <div className="stat-label">VIDEOS</div>
+            </div>
+            <div className="progress-stat-box">
+              <div className="stat-number">{totalAssignments}</div>
+              <div className="stat-label">ASSIGNMENTS</div>
+            </div>
+            <div className="progress-stat-box">
+              <div className="stat-number">{completionPercentage}%</div>
+              <div className="stat-label">COMPLETE</div>
+            </div>
+          </div>
+          <div className="video-progress-section">
+            <h3 className="progress-subtitle">Video Progress</h3>
+            <div className="progress-bar-container">
+              <div 
+                className="progress-bar-fill" 
+                style={{ width: `${(completedVideos.length / totalVideos) * 100}%` }}
+              ></div>
+            </div>
+            <p className="progress-text">
+              {completedVideos.length} of {totalVideos} videos completed
+            </p>
+          </div>
+        </div>
+
+        {/* Video Lectures Section */}
+        <div className="nptel-section">
+          <h2 className="nptel-section-title">📹 Video Lectures</h2>
+          <div className="nptel-videos-grid">
+            {courseContent.videos.map((video, index) => (
+              <div key={video.id} className="nptel-video-card">
+                <div className="video-card-header">
+                  <h3 className="video-lecture-number">Lecture {index + 1}</h3>
+                  <span className="video-duration">{video.duration}</span>
+                </div>
+                <div className="nptel-video-container">
+                  <iframe
+                    src={video.url}
+                    title={video.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="nptel-video-iframe"
+                  ></iframe>
+                </div>
+                <div className="video-card-footer">
+                  <h4 className="video-title">{video.title}</h4>
+                  <button 
+                    className={`mark-complete-btn ${completedVideos.includes(video.id) ? 'completed' : ''}`}
+                    onClick={() => handleVideoComplete(video.id)}
+                  >
+                    {completedVideos.includes(video.id) ? '✓ Completed' : 'Mark as Complete'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Assignments Section */}
+        <div className="nptel-section">
+          <h2 className="nptel-section-title">📝 Assignments</h2>
+          <div className="nptel-assignments-grid">
+            {courseContent.assignments.map((assignment) => (
+              <div key={assignment.id} className="nptel-assignment-card">
+                <div className="assignment-card-header">
+                  <h3 className="assignment-title">{assignment.title}</h3>
+                  <span className="assignment-marks">{assignment.marks} Marks</span>
+                </div>
+                <p className="assignment-description">{assignment.description}</p>
+                <div className="assignment-meta">
+                  <span className="assignment-deadline">
+                    📅 Deadline: {assignment.deadline}
+                  </span>
+                </div>
+                <div className="assignment-actions">
+                  <button 
+                    className="nptel-btn nptel-btn-primary"
+                    onClick={() => handleAssignmentStart(assignment.id)}
+                  >
+                    Start Assignment
+                  </button>
+                  <button className="nptel-btn nptel-btn-secondary">
+                    View Submission
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quizzes Section */}
+        <div className="nptel-section">
+          <h2 className="nptel-section-title">✍️ Weekly Quizzes</h2>
+          <div className="nptel-quizzes-grid">
+            {courseContent.quizzes.map((quiz) => (
+              <div key={quiz.id} className="nptel-quiz-card">
+                <div className="quiz-card-header">
+                  <h3 className="quiz-title">{quiz.title}</h3>
+                  <span className="quiz-marks">{quiz.marks} Marks</span>
+                </div>
+                <div className="quiz-meta">
+                  <span className="quiz-time">⏱️ Time Limit: {quiz.timeLimit}</span>
+                </div>
+                <div className="quiz-actions">
+                  <button 
+                    className="nptel-btn nptel-btn-quiz"
+                    onClick={() => handleQuizStart(quiz.id)}
+                  >
+                    Start Quiz
+                  </button>
+                  {completedQuizzes.includes(quiz.id) && (
+                    <span className="quiz-score">Score: 45/{quiz.marks}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CourseLearningPage;
+            <div className="video-player">
+              {courseContent.videos && courseContent.videos[currentVideo] ? (
+                <iframe
+                  src={courseContent.videos[currentVideo].url}
+                  title={courseContent.videos[currentVideo].title}
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  background: '#000',
+                  color: '#fff',
+                  fontSize: '1.2rem'
+                }}>
+                  📹 Video not available
+                </div>
+              )}
+            </div>
+            <div className="video-info">
+              <h3>{courseContent.videos && courseContent.videos[currentVideo] ? courseContent.videos[currentVideo].title : 'Video Title'}</h3>
+              <p>Duration: {courseContent.videos && courseContent.videos[currentVideo] ? courseContent.videos[currentVideo].duration : 'N/A'}</p>
+            </div>
+          </div>
+
+          {/* Course Videos Playlist - SECOND */}
+          <div className="video-playlist" style={{ border: '3px solid blue' }}>
+            <h3>🎬 Course Videos</h3>
+            <div className="playlist">
+              {courseContent.videos && courseContent.videos.length > 0 ? (
+                courseContent.videos.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className={`playlist-item ${index === currentVideo ? 'active' : ''}`}
+                    onClick={() => setCurrentVideo(index)}
+                  >
+                    <img src={video.thumbnail} alt={video.title} />
+                    <div className="video-details">
+                      <h4>{video.title}</h4>
+                      <p>{video.duration}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                  📚 No videos available
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Assignments Section - THIRD */}
+          <div className="assignments-section" style={{ border: '3px solid green' }}>
+            <h3>📝 Assignments</h3>
+            <div className="assignments-list">
+              {courseContent.assignments && courseContent.assignments.length > 0 ? (
+                courseContent.assignments.map(assignment => (
+                  <div key={assignment.id} className="assignment-item interactive-element">
+                    <div className="assignment-header">
+                      <label className="assignment-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={completedAssignments.includes(assignment.id)}
+                          onChange={() => handleAssignmentToggle(assignment.id)}
+                        />
+                        <span className="checkmark"></span>
+                      </label>
+                      <div className="assignment-info">
+                        <h4>{assignment.title}</h4>
+                        <p>{assignment.description}</p>
+                        <div className="assignment-meta">
+                          <span className="due-date">Due: {assignment.dueDate}</span>
+                          <span className="points">{assignment.points} points</span>
+                        </div>
+                        <span className={`assignment-status ${completedAssignments.includes(assignment.id) ? 'completed' : 'pending'}`}>
+                          {completedAssignments.includes(assignment.id) ? 'Completed' : 'Pending'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                  📝 No assignments available
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Feedback Section - FOURTH */}
+          <div className="feedback-section">
+            <h3>⭐ Course Feedback</h3>
+            <form className="feedback-form">
+              <div className="form-group">
+                <label>Overall Rating</label>
+                <div className="rating-stars">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <span
+                      key={star}
+                      className={`star ${star <= feedback.rating ? 'filled' : ''}`}
+                      onClick={() => handleFeedbackChange('rating', star)}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Comments</label>
+                <textarea
+                  className="feedback-textarea"
+                  value={feedback.comments}
+                  onChange={(e) => handleFeedbackChange('comments', e.target.value)}
+                  placeholder="Share your thoughts about this course..."
+                  rows="4"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="topic-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={feedback.recommend}
+                    onChange={(e) => handleFeedbackChange('recommend', e.target.checked)}
+                  />
+                  <span className="checkmark"></span>
+                  I would recommend this course to others
+                </label>
+              </div>
+
+              <button type="button" className="submit-feedback-btn" onClick={handleFeedbackSubmit}>
+                Submit Feedback
+              </button>
+            </form>
+          </div>
+
+          {/* Brand badge at bottom-right after feedback */}
+          <div className="brand-badge">iVidharthi</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CourseLearningPage;

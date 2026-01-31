@@ -1,0 +1,419 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import LoadingAnimation from './LoadingAnimation';
+import CoinAnimation from './CoinAnimation';
+import SuccessScreen from './SuccessScreen';
+import './RazorpayPayment.css';
+
+const RazorpayPayment = ({ onPaymentSuccess }) => {
+  const [amount, setAmount] = useState(500);
+  const [gstAmount, setGstAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(500);
+  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [showCoins, setShowCoins] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('upi');
+  const [userDetails, setUserDetails] = useState({
+    name: "Student",
+    email: "student@example.com",
+    contact: "9999999999",
+    userId: `user_${Date.now()}`, // Fallback unique ID
+    courseId: "course_456"
+  });
+
+  // Calculate GST whenever amount changes
+  useEffect(() => {
+    const base = parseFloat(amount) || 0;
+    const gst = base * 0.18; // 18% GST
+    setGstAmount(gst);
+    setTotalAmount(base + gst);
+  }, [amount]);
+
+  useEffect(() => {
+    // 1. Get logged in user details
+    try {
+      const authUser = localStorage.getItem('auth_user');
+      if (authUser) {
+        const parsedUser = JSON.parse(authUser);
+        setUserDetails(prev => ({
+          ...prev,
+          name: parsedUser.name || prev.name,
+          email: parsedUser.email || prev.email,
+          // Use the user's _id or id for enrollment tracking
+          userId: parsedUser.id || parsedUser._id || `user_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        }));
+      } else {
+        // No user logged in - generate unique guest ID
+        setUserDetails(prev => ({
+          ...prev,
+          userId: `guest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+        }));
+      }
+      
+      // 2. Get selected course details
+      const selectedCourse = localStorage.getItem('selected_course');
+      if (selectedCourse) {
+         const parsedCourse = JSON.parse(selectedCourse);
+         // Use Course_Id if available, otherwise fall back to _id or id
+         const courseIdentifier = parsedCourse.Course_Id || parsedCourse.id || parsedCourse._id || parsedCourse.courseId || 'unknown';
+         
+         setUserDetails(prev => ({
+            ...prev,
+            courseId: courseIdentifier.toString() // Convert to string for consistency
+         }));
+         
+         console.log('📚 Selected Course:', {
+            Title: parsedCourse.Title || parsedCourse.title || parsedCourse.name,
+            Course_Id: courseIdentifier,
+            Price: parsedCourse.price
+         });
+         
+         if (parsedCourse.price) {
+            // Remove non-numeric characters if price is like "₹500"
+            const numericPrice = parseFloat(parsedCourse.price.toString().replace(/[^0-9.]/g, ''));
+            if (!isNaN(numericPrice)) {
+              setAmount(numericPrice);
+            }
+         }
+      }
+    } catch (error) {
+      console.error("Error loading details:", error);
+    }
+  }, []);
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async () => {
+    setLoading(true);
+
+    // 1. Load Razorpay Script
+    const res = await loadRazorpayScript();
+    if (!res) {
+      alert('Razorpay SDK failed to load. Are you online?');
+      setLoading(false);
+      return;
+    }
+
+    // 2. Create Order on Backend
+    try {
+      const orderUrl = 'http://localhost:5000/api/payments/create-order';
+      const { data } = await axios.post(orderUrl, {
+        amount: totalAmount, // Send total amount including GST
+        studentId: userDetails.userId, // Matching backend expectation
+        courseId: userDetails.courseId,
+        type: 'Card', // Changed from 'course_enrollment' to match backend enum ["Card", "UPI", "NetBanking", "Wallet"]
+        studentName: userDetails.name,
+        studentEmail: userDetails.email
+      });
+
+      if (!data.success) {
+        alert('Server error. Are you online?');
+        setLoading(false);
+        return;
+      }
+
+      const { amount: orderAmount, orderId: order_id, currency, razorpayKey } = data.data;
+
+      // Define handler function
+      const handlePaymentSuccess = async (response) => {
+          setLoading(false);
+          setProcessing(true); // Show processing animation
+
+          const verifyUrl = 'http://localhost:5000/api/payments/verify-payment';
+          try {
+            const verifyRes = await axios.post(verifyUrl, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId: userDetails.userId,
+              courseId: userDetails.courseId,
+              amount: totalAmount,
+              email: userDetails.email,
+              contact: userDetails.contact,
+              receiptNo: data.data.receiptNo // Pass receiptNo if needed by backend
+            });
+
+            if (verifyRes.data.success) {
+              // Get course details from localStorage
+              const selectedCourse = JSON.parse(localStorage.getItem('selected_course') || '{}');
+              const courseName = selectedCourse.Title || selectedCourse.title || selectedCourse.name || 'Course Enrollment';
+              
+              setPaymentDetails({
+                amount: totalAmount,
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+                studentEmail: userDetails.email,
+                studentName: userDetails.name,
+                courseName: courseName,
+                date: new Date()
+              });
+              
+              // Show Coin Animation after processing
+              setTimeout(() => {
+                setProcessing(false);
+                setShowCoins(true);
+              }, 2000);
+            } else {
+              alert('Payment verification failed');
+              setProcessing(false);
+            }
+          } catch (error) {
+            console.error(error);
+            alert('Payment verification failed on server');
+            setProcessing(false);
+          }
+      };
+
+      // Check for Demo Mode
+      if (order_id.startsWith('order_DEMO_')) {
+        console.log("⚠️ Demo Mode Detected: Simulating payment flow");
+        
+        // Simulate Razorpay opening delay
+        setTimeout(() => {
+          // Automatically proceed without popup
+          const demoResponse = {
+            razorpay_order_id: order_id,
+            razorpay_payment_id: `pay_DEMO_${Date.now()}`,
+            razorpay_signature: 'sig_DEMO_bypass' // Backend must accept this in demo mode
+          };
+          handlePaymentSuccess(demoResponse);
+        }, 1500);
+        return;
+      }
+
+      // 3. Open Razorpay Checkout
+      const options = {
+        key: razorpayKey,
+        amount: orderAmount.toString(),
+        currency: currency,
+        name: 'iVidhyarthi',
+        description: 'Course Enrollment',
+        order_id: order_id,
+        handler: handlePaymentSuccess,
+        prefill: {
+          name: userDetails.name,
+          email: userDetails.email,
+          contact: userDetails.contact,
+        },
+        theme: {
+          color: '#3399cc',
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      
+      // Simulate 1-2 seconds loading before opening checkout as requested
+      setTimeout(() => {
+        setLoading(false); // Hide our loading
+        paymentObject.open();
+      }, 1500);
+
+    } catch (error) {
+      console.error("Payment Error:", error);
+      const errorMsg = error.response?.data?.message || error.message || 'Error creating order';
+      alert(`Payment Failed: ${errorMsg}`);
+      setLoading(false);
+    }
+  };
+
+  const handleCoinComplete = () => {
+    setShowCoins(false);
+    setSuccess(true);
+    // Set flag for CourseLearningPage
+    localStorage.setItem('payment_success', 'true');
+  };
+
+  if (success) {
+    return <SuccessScreen paymentDetails={paymentDetails} onContinue={() => {
+      if (onPaymentSuccess) {
+        onPaymentSuccess();
+      } else {
+        window.location.href = '/learning';
+      }
+    }} />;
+  }
+
+  return (
+    <div className="razorpay-payment-container">
+      {loading && <LoadingAnimation text="Initiating Payment..." />}
+      {processing && <LoadingAnimation text="Processing Transaction..." />}
+      {showCoins && <CoinAnimation onComplete={handleCoinComplete} />}
+
+      <div className="payment-card">
+        <h2>Complete Your Enrollment</h2>
+        <div className="amount-selection">
+          <label>Course Price (₹)</label>
+          <input
+            type="number"
+            className="amount-input"
+            value={amount}
+            disabled
+            readOnly
+            style={{ cursor: 'not-allowed', backgroundColor: '#f5f5f5' }}
+          />
+          
+          <div className="price-breakdown">
+            <div className="price-row">
+              <span>Base Price:</span>
+              <span>₹{parseFloat(amount || 0).toFixed(2)}</span>
+            </div>
+            <div className="price-row gst-row">
+              <span>GST (18%):</span>
+              <span>₹{gstAmount.toFixed(2)}</span>
+            </div>
+            <div className="price-row total-row">
+              <span>Total Payable:</span>
+              <span>₹{totalAmount.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Method Selection */}
+        <div className="payment-methods-section">
+          <h3 className="payment-methods-title">Select Payment Method</h3>
+          
+          <div className="payment-methods-grid">
+            {/* UPI / QR */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'upi' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('upi')}
+            >
+              <div className="payment-method-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>UPI / QR</h4>
+                <p>GooglePay, PhonePe, BHIM & more</p>
+              </div>
+              {selectedPaymentMethod === 'upi' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+
+            {/* Google Pay */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'gpay' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('gpay')}
+            >
+              <div className="payment-method-icon gpay-icon">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="20" fill="#4285F4"/>
+                  <circle cx="24" cy="24" r="16" fill="#34A853"/>
+                  <circle cx="24" cy="24" r="12" fill="#FBBC04"/>
+                  <circle cx="24" cy="24" r="8" fill="#EA4335"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>Google Pay</h4>
+                <p>Cards and UPI payment</p>
+              </div>
+              {selectedPaymentMethod === 'gpay' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+
+            {/* Debit/Credit Cards */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'card' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('card')}
+            >
+              <div className="payment-method-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>Debit/Credit Cards</h4>
+                <p>Visa, Master, Amex</p>
+              </div>
+              {selectedPaymentMethod === 'card' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+
+            {/* Net Banking */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'netbanking' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('netbanking')}
+            >
+              <div className="payment-method-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>Net Banking</h4>
+                <p>All Indian banks</p>
+              </div>
+              {selectedPaymentMethod === 'netbanking' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+
+            {/* Wallets */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'wallet' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('wallet')}
+            >
+              <div className="payment-method-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                  <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>Wallets</h4>
+                <p>Paytm, Mobikwik, Freecharge</p>
+              </div>
+              {selectedPaymentMethod === 'wallet' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+
+            {/* EMI */}
+            <div 
+              className={`payment-method-card ${selectedPaymentMethod === 'emi' ? 'selected' : ''}`}
+              onClick={() => setSelectedPaymentMethod('emi')}
+            >
+              <div className="payment-method-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                  <path d="M16 3v4M8 3v4M2 11h20"/>
+                </svg>
+              </div>
+              <div className="payment-method-info">
+                <h4>EMI</h4>
+                <p>Easy installments</p>
+              </div>
+              {selectedPaymentMethod === 'emi' && (
+                <div className="payment-method-check">✓</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <button className="pay-btn" onClick={handlePayment}>
+          PAY NOW (₹{totalAmount.toFixed(2)})
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default RazorpayPayment;

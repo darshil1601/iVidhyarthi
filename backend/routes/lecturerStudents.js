@@ -1,0 +1,144 @@
+const express = require("express");
+const router = express.Router();
+const Tbl_Courses = require("../models/Tbl_Courses");
+const Tbl_Enrollments = require("../models/Tbl_Enrollments");
+const Tbl_Students = require("../models/Tbl_Students");
+const User = require("../models/User");
+const Tbl_Lecturers = require("../models/Tbl_Lecturers");
+const Tbl_VideoProgress = require("../models/Tbl_VideoProgress");
+const Tbl_Submissions = require("../models/Tbl_Submissions");
+const Tbl_Assignments = require("../models/Tbl_Assignments");
+const Tbl_CourseContent = require("../models/Tbl_CourseContent");
+
+// Get all students enrolled in lecturer's courses
+router.get("/:lecturerId", async (req, res) => {
+  try {
+    const { lecturerId } = req.params;
+
+    // Resolve lecturer identifier (email or ID) to actual lecturer identity
+    let lecturerIdentifier = lecturerId;
+
+    // If it's an email, find the user and then the lecturer
+    if (lecturerId.includes('@')) {
+      const user = await User.findOne({ email: lecturerId.toLowerCase() });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+
+      const lecturer = await Tbl_Lecturers.findOne({ User_Id: user._id });
+      if (!lecturer) {
+        return res.status(404).json({
+          success: false,
+          message: "Lecturer profile not found"
+        });
+      }
+
+      // Use the email as the lecturer identifier for courses
+      lecturerIdentifier = lecturerId.toLowerCase();
+    }
+
+    // Get all courses by this lecturer
+    const lecturerCourses = await Tbl_Courses.find({
+      Lecturer_Id: lecturerIdentifier
+    });
+
+    const courseIds = lecturerCourses.map(course => course.Course_Id);
+
+    // If no courses found, return empty array
+    if (courseIds.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    // Get all enrollments for lecturer's courses
+    const enrollments = await Tbl_Enrollments.find({
+      Course_Id: { $in: courseIds }
+    }).sort({ Enrolled_On: -1 });
+
+    // Build student details array
+    const studentDetails = await Promise.all(
+      enrollments.map(async (enrollment) => {
+        // Get student info
+        const student = await Tbl_Students.findOne({
+          User_Id: enrollment.Student_Id
+        });
+
+        // Get student user info for email
+        const studentUser = await User.findById(enrollment.Student_Id);
+
+        // Get course info
+        const course = await Tbl_Courses.findOne({
+          Course_Id: enrollment.Course_Id
+        });
+
+        return {
+          id: enrollment.Enrollment_Id,
+          enrollmentId: enrollment.Enrollment_Id,
+          studentName: student ? student.Full_Name : 'Unknown Student',
+          email: studentUser ? studentUser.email : 'N/A',
+          course: course ? course.Title : 'Unknown Course',
+          courseId: enrollment.Course_Id,
+          enrollDate: enrollment.Enrolled_On,
+          status: enrollment.Status,
+          paymentStatus: enrollment.Payment_Status,
+          progress: await (async () => {
+            try {
+              // Ensure Course_Id is handled as both Number and String for different models
+              const courseIdNum = Number(enrollment.Course_Id);
+              const courseIdStr = String(enrollment.Course_Id);
+
+              // 1. Calculate Video Progress
+              const totalVideos = await Tbl_CourseContent.countDocuments({
+                $or: [{ Course_Id: courseIdNum }, { Course_Id: courseIdStr }],
+                Content_Type: "video"
+              });
+              const completedVideosCount = await Tbl_VideoProgress.countDocuments({
+                Student_Id: enrollment.Student_Id,
+                $or: [{ Course_Id: courseIdNum }, { Course_Id: courseIdStr }],
+                Is_Completed: true,
+              });
+
+              // 2. Calculate Assignment Progress
+              const assignments = await Tbl_Assignments.find({
+                $or: [{ Course_Id: courseIdNum }, { Course_Id: courseIdStr }]
+              });
+              const totalAssignments = assignments.length;
+              const assignmentIds = assignments.map(a => a.Assignment_Id);
+              const submittedAssignmentsCount = await Tbl_Submissions.countDocuments({
+                Student_Id: enrollment.Student_Id,
+                Assignment_Id: { $in: assignmentIds }
+              });
+
+              // 3. Calculate Overall Progress
+              const totalItems = totalVideos + totalAssignments;
+              const completedItems = completedVideosCount + submittedAssignmentsCount;
+              return totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+            } catch (err) {
+              console.error(`Error calculating progress for student ${enrollment.Student_Id}:`, err);
+              return 0;
+            }
+          })()
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: studentDetails
+    });
+  } catch (error) {
+    console.error("Error fetching lecturer students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching student data",
+      error: error.message
+    });
+  }
+});
+
+module.exports = router;
