@@ -106,7 +106,7 @@ const RazorpayPayment = ({ onPaymentSuccess }) => {
 
     // 2. Create Order on Backend
     try {
-      const orderUrl = 'http://localhost:5000/api/payments/create-order';
+      const orderUrl = `${import.meta.env.VITE_API_URL}/api/payments/create-order`;
       const { data } = await axios.post(orderUrl, {
         amount: totalAmount, // Send total amount including GST
         studentId: userDetails.userId, // Matching backend expectation
@@ -129,7 +129,7 @@ const RazorpayPayment = ({ onPaymentSuccess }) => {
           setLoading(false);
           setProcessing(true); // Show processing animation
 
-          const verifyUrl = 'http://localhost:5000/api/payments/verify-payment';
+          const verifyUrl = `${import.meta.env.VITE_API_URL}/api/payments/verify-payment`;
           try {
             const verifyRes = await axios.post(verifyUrl, {
               razorpay_order_id: response.razorpay_order_id,

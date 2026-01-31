@@ -33,7 +33,7 @@ const EnrolledCourses = ({ onNavigate }) => {
         console.log('Fetching enrollments for student:', studentId);
 
         // Fetch enrollments from API
-        const response = await fetch(`http://localhost:5000/api/enrollments/student/${studentId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${studentId}`);
         const result = await response.json();
 
         if (!result.success) {
@@ -43,7 +43,7 @@ const EnrolledCourses = ({ onNavigate }) => {
         console.log('Enrollments fetched:', result.data);
 
         // Fetch video progress for all courses
-        const videoProgressResponse = await fetch(`http://localhost:5000/api/video-progress/student/${studentId}/all`);
+        const videoProgressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/video-progress/student/${studentId}/all`);
         const videoProgressResult = await videoProgressResponse.json();
         
         // Map video progress by course ID
@@ -105,7 +105,7 @@ const EnrolledCourses = ({ onNavigate }) => {
   const calculateCourseProgress = async (courseId, videoProgress) => {
     try {
       // Fetch total videos for this course
-      const courseContentResponse = await fetch(`http://localhost:5000/api/course-content/course/${courseId}`);
+      const courseContentResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-content/course/${courseId}`);
       const courseContentResult = await courseContentResponse.json();
       
       if (!courseContentResult.success || !courseContentResult.data) {

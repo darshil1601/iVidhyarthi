@@ -54,7 +54,7 @@ const PopularCategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tbl-courses');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses`);
         const result = await response.json();
         
         if (result.success && Array.isArray(result.data)) {

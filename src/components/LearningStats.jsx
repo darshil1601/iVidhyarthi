@@ -39,7 +39,7 @@ const LearningStats = () => {
       }
 
       // Fetch enrollments to count completed courses
-      const enrollmentsResponse = await fetch(`http://localhost:5000/api/enrollments/student/${studentId}`);
+      const enrollmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${studentId}`);
       const enrollmentsResult = await enrollmentsResponse.json();
 
       let coursesCompleted = 0;
@@ -58,13 +58,13 @@ const LearningStats = () => {
       }
 
       // Fetch certifications
-      const certificationsResponse = await fetch(`http://localhost:5000/api/certifications/student/${studentId}`);
+      const certificationsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/certifications/student/${studentId}`);
       const certificationsResult = await certificationsResponse.json();
       
       const certificatesEarned = certificationsResult.success ? (certificationsResult.data?.length || 0) : 0;
 
       // Fetch video progress for detailed learning hours
-      const videoProgressResponse = await fetch(`http://localhost:5000/api/video-progress/student/${studentId}/all`);
+      const videoProgressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/video-progress/student/${studentId}/all`);
       const videoProgressResult = await videoProgressResponse.json();
       
       if (videoProgressResult.success && videoProgressResult.data) {
@@ -92,7 +92,7 @@ const LearningStats = () => {
         const skillMap = {};
         
         // Fetch video progress for detailed calculation
-        const videoProgressResponse = await fetch(`http://localhost:5000/api/video-progress/student/${studentId}/all`);
+        const videoProgressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/video-progress/student/${studentId}/all`);
         const videoProgressResult = await videoProgressResponse.json();
         
         // Map video progress by course ID
@@ -116,7 +116,7 @@ const LearningStats = () => {
             
             // Fetch course content to count total videos
             try {
-              const courseContentResponse = await fetch(`http://localhost:5000/api/course-content/course/${courseId}`);
+              const courseContentResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-content/course/${courseId}`);
               const courseContentResult = await courseContentResponse.json();
               
               let totalVideos = 0;

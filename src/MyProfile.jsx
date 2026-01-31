@@ -31,7 +31,7 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
       if (user?.id || user?._id) {
         try {
           const userId = user.id || user._id;
-          const response = await axios.get(`http://localhost:5000/api/auth/student-profile/${userId}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/student-profile/${userId}`);
           if (response.data.success) {
             const student = response.data.data;
             setStudentData(student);
@@ -56,12 +56,12 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
           }
 
           // Fetch enrollment statistics
-          const enrollmentResponse = await axios.get(`http://localhost:5000/api/enrollments/student/${userId}`);
+          const enrollmentResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${userId}`);
           if (enrollmentResponse.data.success) {
             const enrollments = enrollmentResponse.data.data;
             
             // Fetch certificates count
-            const certificatesResponse = await axios.get(`http://localhost:5000/api/certifications/${userId}`);
+            const certificatesResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/certifications/${userId}`);
             const certificatesCount = certificatesResponse.data.success ? certificatesResponse.data.data.length : 0;
             
             setEnrollmentStats({
@@ -95,13 +95,13 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
     try {
       setLoading(true);
       const userId = user.id || user._id;
-      const response = await axios.put(`http://localhost:5000/api/auth/update-student-profile/${userId}`, editableData);
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/update-student-profile/${userId}`, editableData);
       if (response.data.success) {
         setNotification({ show: true, message: 'Profile updated successfully!', type: 'success' });
         setTimeout(() => setNotification({ show: false, message: '', type: '' }), 3000);
         setIsEditing(false);
         // Refresh profile data
-        const updatedResponse = await axios.get(`http://localhost:5000/api/auth/student-profile/${userId}`);
+        const updatedResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/student-profile/${userId}`);
         if (updatedResponse.data.success) {
           const student = updatedResponse.data.data;
           setStudentData(student);
@@ -137,7 +137,7 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
     try {
       setLoading(true);
       const userId = user.id || user._id;
-      const response = await axios.post(`http://localhost:5000/api/auth/change-password`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/change-password`, {
         userId,
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
@@ -167,7 +167,7 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`http://localhost:5000/send-otp`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/send-otp`, {
         email: otpData.email
       });
 
@@ -199,7 +199,7 @@ const MyProfile = ({ user, onNavigate, onLogout }) => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`http://localhost:5000/reset-password`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/reset-password`, {
         email: otpData.email,
         otp: otpData.otp,
         newPassword: otpData.newPassword
@@ -612,7 +612,7 @@ const CertificateList = ({ userId }) => {
     const fetchCertificates = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/certifications/${userId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/certifications/${userId}`);
         if (response.data.success) {
           setCertificates(response.data.data);
         } else {
@@ -634,7 +634,7 @@ const CertificateList = ({ userId }) => {
   const handleViewCertificate = async (certificate) => {
     try {
       // Fetch the certificate PDF
-      const response = await axios.post(`http://localhost:5000/api/certifications/generate`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/certifications/generate`, {
         courseId: certificate.Course_Id,
         studentId: certificate.Student_Id,
         checkOnly: true
@@ -695,7 +695,7 @@ const CertificateList = ({ userId }) => {
       for (const cert of certificates) {
         if (cert.Course_Id && !courseNames[cert.Course_Id]) {
           try {
-            const response = await axios.get(`http://localhost:5000/api/courses/${cert.Course_Id}`);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/courses/${cert.Course_Id}`);
             if (response.data.success && response.data.course) {
               names[cert.Course_Id] = response.data.course.Title || response.data.course.Course_Name || cert.Course_Id;
             } else {

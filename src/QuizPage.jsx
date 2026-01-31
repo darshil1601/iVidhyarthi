@@ -152,7 +152,7 @@ const QuizPage = ({ quiz, courseId, weekNumber, onBack, onComplete }) => {
 
       console.log('📤 Submitting Quiz:', attemptData);
 
-      const response = await fetch('http://localhost:5000/api/auto-quiz/attempt', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auto-quiz/attempt`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

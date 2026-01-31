@@ -290,7 +290,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     setLoadingTranscript(prev => ({ ...prev, [videoId]: true }));
 
     try {
-      const response = await fetch('http://localhost:5000/api/transcription/generate', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/transcription/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -362,7 +362,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     if (!currentTranscript) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/transcription/download-pdf', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/transcription/download-pdf`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -443,7 +443,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       try {
         const courseData = JSON.parse(savedCourse);
-        const response = await fetch(`http://localhost:5000/api/courses/${courseData.id || courseData.Course_Id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/${courseData.id || courseData.Course_Id}`, {
           headers: {
             'Authorization': `Bearer ${authToken}`
           }
@@ -466,7 +466,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       try {
         // Calculate comprehensive progress from database
         const calculateResponse = await fetch(
-          'http://localhost:5000/api/progress/calculate',
+          `${import.meta.env.VITE_API_URL}/api/progress/calculate`,
           {
             method: 'POST',
             headers: {
@@ -584,7 +584,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       console.log('🔍 Background check for certificate:', { courseId, studentId });
       
       // Check backend for certificate existence
-      const response = await fetch(`http://localhost:5000/api/certifications/check/${courseId}/${studentId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/certifications/check/${courseId}/${studentId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
@@ -636,7 +636,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     try {
       // Fetch all submissions from Tbl_Submissions
       const submissionsResponse = await fetch(
-        `http://localhost:5000/api/submissions/student/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/submissions/student/${studentId}`
       );
       const submissionsResult = await submissionsResponse.json();
 
@@ -676,7 +676,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       for (const assignment of courseContent.assignments) {
         if (!submissions[assignment.id]) {
           const response = await fetch(
-            `http://localhost:5000/api/assignments/submission/${assignment.id}/${studentId}`
+            `${import.meta.env.VITE_API_URL}/api/assignments/submission/${assignment.id}/${studentId}`
           );
           const result = await response.json();
           if (result.success && result.hasSubmission) {
@@ -699,7 +699,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       // Create enrollment record
       if (paymentInfo && userId) {
-        const enrollmentResponse = await fetch('http://localhost:5000/api/enrollments/create', {
+        const enrollmentResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/enrollments/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -715,7 +715,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
           // Create earnings record for lecturer
           if (course.Lecturer_Id && paymentInfo.amount) {
-            await fetch('http://localhost:5000/api/earnings/create', {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/earnings/create`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -755,7 +755,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
   const fetchAssignments = async (courseId) => {
     try {
       console.log('🔍 Fetching assignments for courseId:', courseId);
-      const response = await fetch(`http://localhost:5000/api/assignments/course/${courseId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/assignments/course/${courseId}`);
       const result = await response.json();
       if (result.success) {
         console.log('📝 Assignments fetched:', result.data);
@@ -770,7 +770,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
   // Fetch course topics from backend
   const fetchCourseTopics = async (courseId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/course-topics/course/${courseId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-topics/course/${courseId}`);
       const result = await response.json();
       if (result.success) {
         setCourseTopics(result.data);
@@ -781,7 +781,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
         for (const topic of result.data) {
           try {
             console.log(`🔍 Fetching subtopics for Topic_Id: ${topic.Topic_Id}`);
-            const subTopicResponse = await fetch(`http://localhost:5000/api/course-topics/${topic.Topic_Id}/subtopics`);
+            const subTopicResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-topics/${topic.Topic_Id}/subtopics`);
             const subTopicResult = await subTopicResponse.json();
             console.log(`📦 Subtopics response for Topic_Id ${topic.Topic_Id}:`, subTopicResult);
             if (subTopicResult.success && subTopicResult.data) {
@@ -807,7 +807,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     setLoadingCourseInfo(true);
     try {
       // Fetch course details including lecturer, institute, description
-      const courseResponse = await fetch(`http://localhost:5000/api/tbl-courses/${courseId}`);
+      const courseResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses/${courseId}`);
       const courseResult = await courseResponse.json();
 
       if (courseResult.success && courseResult.data) {
@@ -819,7 +819,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
         // Fetch lecturer information
         if (course.Lecturer_Id) {
           try {
-            const lecturerResponse = await fetch(`http://localhost:5000/api/lecturer-profile/${course.Lecturer_Id}`);
+            const lecturerResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/lecturer-profile/${course.Lecturer_Id}`);
             const lecturerResult = await lecturerResponse.json();
             if (lecturerResult.success && lecturerResult.data) {
               setLecturerInfo(lecturerResult.data);
@@ -834,7 +834,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
                   }
 
                   if (instituteId) {
-                    const instituteResponse = await fetch(`http://localhost:5000/api/institutes/${instituteId}`);
+                    const instituteResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/institutes/${instituteId}`);
                     const instituteResult = await instituteResponse.json();
                     if (instituteResult.success && instituteResult.data) {
                       setInstituteInfo(instituteResult.data);
@@ -869,7 +869,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
   const fetchCourseContent = async (courseId) => {
     try {
       setLoadingContent(true);
-      const response = await fetch(`http://localhost:5000/api/course-content/course/${courseId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-content/course/${courseId}`);
       const result = await response.json();
       if (result.success) {
         setCourseContents(result.data);
@@ -936,7 +936,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
   // Fetch progress from backend
   const fetchProgress = async (courseId, userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/progress/${courseId}/${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/progress/${courseId}/${userId}`);
       const result = await response.json();
       if (result.success && result.data) {
         setProgress(result.data.Progress_Percent);
@@ -962,7 +962,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       // Calculate and update overall progress in database
       const calculateResponse = await fetch(
-        'http://localhost:5000/api/progress/calculate',
+        `${import.meta.env.VITE_API_URL}/api/progress/calculate`,
         {
           method: 'POST',
           headers: {
@@ -1011,7 +1011,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     try {
       const authToken = localStorage.getItem('auth_token');
       const response = await fetch(
-        `http://localhost:5000/api/video-progress/student/${studentId}/course/${courseId}/completed`,
+        `${import.meta.env.VITE_API_URL}/api/video-progress/student/${studentId}/course/${courseId}/completed`,
         {
           headers: {
             'Authorization': `Bearer ${authToken}`
@@ -1045,7 +1045,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       setLoadingFeedbacks(true);
       const skip = loadMore ? courseFeedbacks.length : 0;
       const limit = loadMore ? 5 : 5;
-      const response = await fetch(`http://localhost:5000/api/feedback/course/${courseId}?skip=${skip}&limit=${limit}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feedback/course/${courseId}?skip=${skip}&limit=${limit}`);
       const result = await response.json();
 
       if (result.success) {
@@ -1121,7 +1121,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/feedback/create', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feedback/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1179,7 +1179,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/feedback/update-comment/${feedbackId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feedback/update-comment/${feedbackId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1227,7 +1227,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/feedback/delete/${feedbackId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feedback/delete/${feedbackId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1279,7 +1279,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     try {
       const courseId = selectedCourse.Course_Id || selectedCourse.id || selectedCourse.courseId;
       const response = await fetch(
-        `http://localhost:5000/api/lecturer/sessions/student?course_ids=${courseId}`
+        `${import.meta.env.VITE_API_URL}/api/lecturer/sessions/student?course_ids=${courseId}`
       );
 
       const result = await response.json();
@@ -1422,8 +1422,8 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       }
 
       const endpoint = isCompleted
-        ? 'http://localhost:5000/api/video-progress/mark-complete'
-        : 'http://localhost:5000/api/video-progress/update';
+        ? `${import.meta.env.VITE_API_URL}/api/video-progress/mark-complete`
+        : `${import.meta.env.VITE_API_URL}/api/video-progress/update`;
 
       // Get student email from auth_user or localStorage
       let studentEmail = localStorage.getItem('user_email') || '';
@@ -1534,7 +1534,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
     try {
       // First try to get from Tbl_Submissions
       const submissionsResponse = await fetch(
-        `http://localhost:5000/api/submissions/student/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/submissions/student/${studentId}`
       );
       const submissionsResult = await submissionsResponse.json();
 
@@ -1592,7 +1592,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       // If not found in Tbl_Submissions, try Tbl_Assignments
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments/submission/${assignmentId}/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/assignments/submission/${assignmentId}/${studentId}`
       );
       const assignmentsResult = await assignmentsResponse.json();
 
@@ -1663,7 +1663,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       // Check attempt eligibility first
       const eligibilityResponse = await fetch(
-        `http://localhost:5000/api/auto-quiz/check-eligibility?studentId=${studentId}&courseId=${courseId}`,
+        `${import.meta.env.VITE_API_URL}/api/auto-quiz/check-eligibility?studentId=${studentId}&courseId=${courseId}`,
         {
           headers: {
             'Authorization': `Bearer ${authToken}`
@@ -1713,7 +1713,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
       // If quiz doesn't exist, generate it
       if (!eligibilityData.quizExists) {
         setIsGeneratingQuiz(true);
-        const generateResponse = await fetch('http://localhost:5000/api/auto-quiz/generate', {
+        const generateResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auto-quiz/generate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1744,7 +1744,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
 
       // Fetch the quiz
       const quizResponse = await fetch(
-        `http://localhost:5000/api/auto-quiz/quiz/${courseId}`,
+        `${import.meta.env.VITE_API_URL}/api/auto-quiz/quiz/${courseId}`,
         {
           headers: {
             'Authorization': `Bearer ${authToken}`
@@ -1888,7 +1888,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
               <div style={{ marginTop: '20px' }}>
                 <h3 style={{ marginBottom: '10px' }}>📄 Uploaded PDF</h3>
                 <button
-                  onClick={() => window.open(`http://localhost:5000${selectedSubmission.File_Url}`, '_blank')}
+                  onClick={() => window.open(`${import.meta.env.VITE_API_URL}${selectedSubmission.File_Url}`, '_blank')}
                   style={{
                     padding: '10px 20px',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -2328,7 +2328,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
                     setGeneratingCertificate(true);
                     try {
                       // Fetch the existing certificate without triggering email
-                      const response = await fetch(`http://localhost:5000/api/certifications/generate?checkOnly=true`, {
+                      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/certifications/generate?checkOnly=true`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -2368,7 +2368,7 @@ const CourseLearningPage = ({ onBackToDashboard, onNavigate }) => {
                     // Generate new certificate
                     setGeneratingCertificate(true);
                     try {
-                      const response = await fetch('http://localhost:5000/api/certifications/generate', {
+                      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/certifications/generate`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

@@ -47,7 +47,7 @@ const CourseDetails = ({ onBack, onPay }) => {
       setLoading(true);
 
       // Fetch course topics
-      const topicsResponse = await fetch(`http://localhost:5000/api/course-topics/course/${courseId}`);
+      const topicsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-topics/course/${courseId}`);
       const topicsResult = await topicsResponse.json();
       if (topicsResult.success) {
         setCourseTopics(topicsResult.data);
@@ -55,7 +55,7 @@ const CourseDetails = ({ onBack, onPay }) => {
         // Fetch subtopics for each topic
         const topicsWithSubs = await Promise.all(
           topicsResult.data.map(async (topic) => {
-            const subtopicsResponse = await fetch(`http://localhost:5000/api/course-subtopics/topic/${topic.Topic_Id}`);
+            const subtopicsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-subtopics/topic/${topic.Topic_Id}`);
             const subtopicsResult = await subtopicsResponse.json();
             return {
               ...topic,
@@ -67,7 +67,7 @@ const CourseDetails = ({ onBack, onPay }) => {
       }
 
       // Fetch course content
-      const contentResponse = await fetch(`http://localhost:5000/api/course-content/course/${courseId}`);
+      const contentResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/course-content/course/${courseId}`);
       const contentResult = await contentResponse.json();
       if (contentResult.success) {
         setCourseContents(contentResult.data);

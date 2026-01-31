@@ -70,7 +70,7 @@ const RazorpayFlow = ({
   const initiateRazorpayPayment = async () => {
     try {
       // Create order on backend
-      const orderResponse = await fetch('http://localhost:5000/api/payments/create-order', {
+      const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payments/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -115,7 +115,7 @@ const RazorpayFlow = ({
           setTimeout(async () => {
             try {
               // Verify payment on backend
-              const verifyResponse = await fetch('http://localhost:5000/api/payments/verify', {
+              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payments/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -170,7 +170,7 @@ const RazorpayFlow = ({
           };
 
           // Verify demo payment
-          const verifyResponse = await fetch('http://localhost:5000/api/payments/verify', {
+          const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payments/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

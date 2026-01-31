@@ -106,7 +106,7 @@ const StudentDashboard = ({ onNavigateCourse, onLogout }) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tbl-courses');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses`);
         const result = await response.json();
         // Extract array exactly from result.data
         const allCourses = Array.isArray(result.data) ? result.data : [];

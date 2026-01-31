@@ -111,7 +111,7 @@ const StudentDashboard = ({ onNavigate, onLogout }) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tbl-courses');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses`);
         const result = await response.json();
         // Extract array exactly from result.data
         const allCourses = Array.isArray(result.data) ? result.data : [];
@@ -216,7 +216,7 @@ const StudentDashboard = ({ onNavigate, onLogout }) => {
         console.log('👤 User ID:', userId);
 
         // Check enrollment status
-        const response = await fetch(`http://localhost:5000/api/enrollments/student/${userId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${userId}`);
         const result = await response.json();
 
         console.log('📊 Enrollment data:', result);

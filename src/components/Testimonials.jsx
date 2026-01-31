@@ -23,7 +23,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchLecturers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tbl-lecturers');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-lecturers`);
         const result = await response.json();
         
         if (result.success && Array.isArray(result.data)) {

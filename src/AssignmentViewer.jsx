@@ -56,7 +56,7 @@ const AssignmentViewer = ({
   const fetchSubmissionStatus = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/submissions/student/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/submissions/student/${studentId}`
       );
       const result = await response.json();
 
@@ -143,7 +143,7 @@ const AssignmentViewer = ({
         formData.append('file', uploadedFile);
       }
 
-      const response = await fetch('http://localhost:5000/api/submissions/submit', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions/submit`, {
         method: 'POST',
         body: formData
       });
@@ -233,7 +233,7 @@ const AssignmentViewer = ({
                 onClick={() => {
                   const url = assignment.File_URL.startsWith('http')
                     ? assignment.File_URL
-                    : `http://localhost:5000${assignment.File_URL}`;
+                    : `${import.meta.env.VITE_API_URL}${assignment.File_URL}`;
                   window.open(url, '_blank');
                 }}
                 style={{
@@ -366,7 +366,7 @@ const AssignmentViewer = ({
                   <div className="file-details">
                     <span className="file-name">{uploadedFile.name}</span>
                     <a
-                      href={`http://localhost:5000${uploadedFile.path}`}
+                      href={`${import.meta.env.VITE_API_URL}${uploadedFile.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="view-file-link"

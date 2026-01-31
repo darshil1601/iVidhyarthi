@@ -10,7 +10,7 @@ const NotificationBell = ({ userId }) => {
     const fetchNotifications = async () => {
         if (!userId) return;
         try {
-            const response = await fetch(`http://localhost:5000/api/notifications/user/${userId}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/user/${userId}`);
             const result = await response.json();
             if (result.success) {
                 setNotifications(result.notifications);
@@ -39,7 +39,7 @@ const NotificationBell = ({ userId }) => {
 
     const markAsRead = async (id) => {
         try {
-            await fetch(`http://localhost:5000/api/notifications/${id}/read`, { method: 'PUT' });
+            await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, { method: 'PUT' });
             fetchNotifications();
         } catch (error) {
             console.error('Error marking as read:', error);
@@ -48,7 +48,7 @@ const NotificationBell = ({ userId }) => {
 
     const markAllAsRead = async () => {
         try {
-            await fetch(`http://localhost:5000/api/notifications/user/${userId}/read-all`, { method: 'PUT' });
+            await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/user/${userId}/read-all`, { method: 'PUT' });
             fetchNotifications();
         } catch (error) {
             console.error('Error marking all as read:', error);

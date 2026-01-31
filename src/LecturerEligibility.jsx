@@ -159,7 +159,7 @@ const LecturerEligibility = ({ onCancel }) => {
     const load = async () => {
       const count = 10; // could be 10 or 15 based on specialization, keep 10 for now
       try {
-        const res = await fetch('http://localhost:5000/api/auth/lecturer/quiz', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/lecturer/quiz`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ specialization: meta.specialization || 'Computer Science', numQuestions: count, seed }),
@@ -300,7 +300,7 @@ const LecturerEligibility = ({ onCancel }) => {
 
       // Try to submit to backend first
       try {
-        const res = await fetch('http://localhost:5000/api/auth/lecturer/quiz/submit', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/lecturer/quiz/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: meta.id, answers: orderedAnswers, specialization: meta.specialization, seed }),

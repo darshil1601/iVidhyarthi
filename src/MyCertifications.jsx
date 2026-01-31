@@ -11,7 +11,7 @@ const MyCertifications = ({ user, onNavigate, onLogout }) => {
     const fetchCertificates = async () => {
       if (!user?.id && !user?._id) return;
       try {
-        const response = await axios.get(`http://localhost:5000/api/certifications/${user.id || user._id}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/certifications/${user.id || user._id}`);
         if (response.data.success) {
           setCertificates(response.data.data);
         }

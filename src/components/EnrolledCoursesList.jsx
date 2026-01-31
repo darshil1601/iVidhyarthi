@@ -16,7 +16,7 @@ const EnrolledCoursesList = ({ studentId, onNavigate }) => {
       
       try {
         console.log("Fetching enrollments for student:", studentId);
-        const response = await axios.get(`http://localhost:5000/api/enrollments/student/${studentId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${studentId}`);
         if (response.data.success) {
           setCourses(response.data.data);
         }

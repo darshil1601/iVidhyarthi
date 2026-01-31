@@ -25,7 +25,7 @@ function EmailVerify({ onGoToLogin }) {
           return;
         }
 
-        const resp = await fetch('http://localhost:5000/api/auth/verify-email?token=' + encodeURIComponent(token));
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-email?token=` + encodeURIComponent(token));
         const data = await resp.json();
 
         if (resp.ok && data?.success) {

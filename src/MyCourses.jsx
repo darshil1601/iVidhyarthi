@@ -18,7 +18,7 @@ const MyCourses = ({ user, onNavigate, onLogout }) => {
       try {
         setLoading(true);
         const studentId = user?.id || user?._id;
-        const response = await axios.get(`http://localhost:5000/api/enrollments/student/${studentId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/enrollments/student/${studentId}`);
         
         if (response.data.success) {
           setCourses(response.data.data || []);

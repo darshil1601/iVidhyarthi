@@ -34,13 +34,13 @@ const RecommendedCourses = ({ onNavigate }) => {
         }
         
         console.log('🎯 Fetching co-enrolled courses for course:', currentCourseId);
-        response = await fetch(`http://localhost:5000/api/recommendations/also-enrolled/${currentCourseId}?${queryParams}`);
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/also-enrolled/${currentCourseId}?${queryParams}`);
       }
       // Priority 2: If user is logged in, show personalized recommendations
       else if (studentId) {
         console.log('👤 Fetching personalized recommendations for student:', studentId);
         // The student endpoint already filters enrolled courses, but we can still pass studentId for consistency
-        response = await fetch(`http://localhost:5000/api/recommendations/student/${studentId}?limit=6`);
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/student/${studentId}?limit=6`);
       }
       // Priority 3: Show popular courses for non-logged-in users
       else {
@@ -54,7 +54,7 @@ const RecommendedCourses = ({ onNavigate }) => {
         }
         
         console.log('🌟 Fetching popular courses');
-        response = await fetch(`http://localhost:5000/api/recommendations/popular?${popularParams}`);
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/recommendations/popular?${popularParams}`);
       }
 
       if (!response.ok) {

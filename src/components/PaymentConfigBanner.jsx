@@ -11,7 +11,7 @@ const PaymentConfigBanner = () => {
 
   useEffect(() => {
     // Check payment configuration status
-    fetch('http://localhost:5000/api/payments/config/status')
+    fetch(`${import.meta.env.VITE_API_URL}/api/payments/config/status`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

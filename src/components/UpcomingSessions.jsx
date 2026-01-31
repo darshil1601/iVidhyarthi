@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 const UpcomingSessions = () => {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

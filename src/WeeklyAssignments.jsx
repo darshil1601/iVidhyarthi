@@ -116,16 +116,16 @@ const WeeklyAssignments = ({ courseId, courseName, onBack }) => {
       setLoading(true);
 
       // Fetch assignments from backend
-      const assignmentsResponse = await fetch(`http://localhost:5000/api/assignments/course/${courseId}`);
+      const assignmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/assignments/course/${courseId}`);
       const assignmentsData = await assignmentsResponse.json();
 
       // Fetch student submissions from BOTH Tbl_Submissions AND Tbl_Assignments
       // 1. Get from Tbl_Submissions
-      const submissionsResponse = await fetch(`http://localhost:5000/api/submissions/student/${stuId}`);
+      const submissionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions/student/${stuId}`);
       const submissionsData = await submissionsResponse.json();
 
       // 2. Get from Tbl_Assignments (submitted assignments)
-      const tblAssignmentsResponse = await fetch(`http://localhost:5000/api/assignments/course/${courseId}`);
+      const tblAssignmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/assignments/course/${courseId}`);
       const tblAssignmentsData = await tblAssignmentsResponse.json();
 
       // Filter submitted assignments for this student from Tbl_Assignments
@@ -156,7 +156,7 @@ const WeeklyAssignments = ({ courseId, courseName, onBack }) => {
       });
 
       // Fetch progress tracking
-      const progressResponse = await fetch(`http://localhost:5000/api/progress/${courseId}/${stuId}`);
+      const progressResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/progress/${courseId}/${stuId}`);
       const progressResult = await progressResponse.json();
 
       if (assignmentsData.success) {
@@ -310,7 +310,7 @@ const WeeklyAssignments = ({ courseId, courseName, onBack }) => {
     try {
       // Try to get submission from Tbl_Assignments first
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments/submission/${assignmentId}/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/assignments/submission/${assignmentId}/${studentId}`
       );
       const assignmentsResult = await assignmentsResponse.json();
 
@@ -322,7 +322,7 @@ const WeeklyAssignments = ({ courseId, courseName, onBack }) => {
 
       // If not found, try Tbl_Submissions
       const submissionsResponse = await fetch(
-        `http://localhost:5000/api/submissions/student/${studentId}`
+        `${import.meta.env.VITE_API_URL}/api/submissions/student/${studentId}`
       );
       const submissionsResult = await submissionsResponse.json();
 
@@ -373,7 +373,7 @@ const WeeklyAssignments = ({ courseId, courseName, onBack }) => {
         Status: progressPercent === 0 ? 'Not Started' : progressPercent === 100 ? 'Completed' : 'In Progress'
       };
 
-      const response = await fetch('http://localhost:5000/api/progress/update', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/progress/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(progressPayload)

@@ -42,7 +42,7 @@ const CourseProgress = ({ onNavigate }) => {
         if (authToken && studentId) {
           try {
             const videoProgressResponse = await fetch(
-              `http://localhost:5000/api/video-progress/student/${studentId}/course/${courseId}/summary`,
+              `${import.meta.env.VITE_API_URL}/api/video-progress/student/${studentId}/course/${courseId}/summary`,
               {
                 headers: {
                   'Authorization': `Bearer ${authToken}`
@@ -62,7 +62,7 @@ const CourseProgress = ({ onNavigate }) => {
         }
 
         // Fetch assignments for this course
-        const assignmentsResponse = await fetch(`http://localhost:5000/api/assignments/course/${courseId}`);
+        const assignmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/assignments/course/${courseId}`);
         const assignmentsResult = await assignmentsResponse.json();
         
         const totalAssignments = assignmentsResult.success ? assignmentsResult.data.length : 0;
@@ -70,7 +70,7 @@ const CourseProgress = ({ onNavigate }) => {
         // Fetch completed assignments for this student
         let completedCount = 0;
         if (authToken && studentId) {
-          const submissionsResponse = await fetch(`http://localhost:5000/api/submissions/student/${studentId}`, {
+          const submissionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions/student/${studentId}`, {
             headers: {
               'Authorization': `Bearer ${authToken}`
             }

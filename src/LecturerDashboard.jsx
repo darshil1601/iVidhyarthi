@@ -612,7 +612,7 @@ function Stat({ label, value, trend, icon, onClick }) {
 }
 
 function OverviewTab() {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [overviewData, setOverviewData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -858,7 +858,7 @@ function OverviewTab() {
 }
 
 function ProfileSlideOver({ open, onClose }) {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [form, setForm] = useState({
     Full_Name: '',
     email: '',
@@ -1033,7 +1033,7 @@ function ProfileSlideOver({ open, onClose }) {
     setResetLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/send-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email.trim() })
@@ -1067,7 +1067,7 @@ function ProfileSlideOver({ open, onClose }) {
 
     setResetLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/verify-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email.trim(), otp: otp.trim() })
@@ -1105,7 +1105,7 @@ function ProfileSlideOver({ open, onClose }) {
 
     setResetLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/reset-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1533,7 +1533,7 @@ function ProfileSlideOver({ open, onClose }) {
 }
 
 function UploadsTab() {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [activeUploadTab, setActiveUploadTab] = useState('materials');
   const [courses, setCourses] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -2282,7 +2282,7 @@ function UploadsTab() {
 }
 
 function SubmissionsTab() {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -2369,7 +2369,7 @@ function SubmissionsTab() {
 
   const handleViewPDF = (submission) => {
     if (submission.File_Url) {
-      window.open(`http://localhost:5000${submission.File_Url}`, '_blank');
+      window.open(`${import.meta.env.VITE_API_URL}${submission.File_Url}`, '_blank');
     }
   };
 
@@ -2618,7 +2618,7 @@ function SubmissionsTab() {
             </div>
             <div className="modal-body" style={{ padding: 0, height: 'calc(100% - 80px)' }}>
               <iframe
-                src={`http://localhost:5000${selectedSubmission.File_Url}`}
+                src={`${import.meta.env.VITE_API_URL}${selectedSubmission.File_Url}`}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -2657,7 +2657,7 @@ function SubmissionsTab() {
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <a
-                  href={`http://localhost:5000${selectedSubmission.File_Url}`}
+                  href={`${import.meta.env.VITE_API_URL}${selectedSubmission.File_Url}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="button secondary"
@@ -2759,7 +2759,7 @@ function SubmissionsTab() {
 }
 
 function SessionsTab() {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   const lecturer = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('lecturer_user')); } catch { return null; }
@@ -3019,7 +3019,7 @@ function SessionsTab() {
 
   const handleStartMeeting = async (sessionId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/lecturer/sessions/${sessionId}/start`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/lecturer/sessions/${sessionId}/start`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -3041,7 +3041,7 @@ function SessionsTab() {
 
   const handleEndMeeting = async (sessionId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/lecturer/sessions/${sessionId}/end`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/lecturer/sessions/${sessionId}/end`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -3482,7 +3482,7 @@ function SessionsTab() {
 }
 
 function StudentsTab() {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [enrollments, setEnrollments] = useState([]);
@@ -4025,7 +4025,7 @@ function FeedbackTab() {
           return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/lecturer-dynamic-data/${lecturerId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/lecturer-dynamic-data/${lecturerId}`);
         const result = await response.json();
 
         if (result.success) {
@@ -4136,7 +4136,7 @@ function FeedbackTab() {
 }
 
 function CoursesTab({ showNotification }) {
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
   // Load categories from MongoDB API
   const [categories, setCategories] = useState([]);
@@ -5336,7 +5336,7 @@ function EarningsTab() {
         console.log('📊 Fetching earnings data for lecturer:', lecturerId);
         // Add timestamp to prevent caching
         const timestamp = new Date().getTime();
-        const response = await fetch(`http://localhost:5000/api/lecturer-dynamic-data/${lecturerId}?_t=${timestamp}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/lecturer-dynamic-data/${lecturerId}?_t=${timestamp}`, {
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache'

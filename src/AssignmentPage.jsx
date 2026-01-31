@@ -712,7 +712,7 @@ const AssignmentPage = ({ assignment, onBack, onComplete }) => {
       // Submit to backend - Save to BOTH Tbl_Submissions AND Tbl_Assignments
 
       // 1. Save to Tbl_Submissions
-      const submissionsResponse = await fetch('http://localhost:5000/api/submissions/create', {
+      const submissionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submissionData)
@@ -722,7 +722,7 @@ const AssignmentPage = ({ assignment, onBack, onComplete }) => {
       console.log('📥 Tbl_Submissions Response:', submissionsResult);
 
       // 2. Save to Tbl_Assignments
-      const assignmentsResponse = await fetch('http://localhost:5000/api/assignments/submit', {
+      const assignmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/assignments/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submissionData)

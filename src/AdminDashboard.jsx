@@ -109,7 +109,7 @@ const AdminDashboard = ({ onLogout }) => {
       const token = localStorage.getItem('auth_token') || `admin_mock_token_${Date.now()}`;
 
       // Fetch all universities
-      const universitiesResponse = await fetch('http://localhost:5000/api/admin/universities/all', {
+      const universitiesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/universities/all`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ const AdminDashboard = ({ onLogout }) => {
       }
 
       // Fetch registrars to get contact numbers
-      const registrarsResponse = await fetch('http://localhost:5000/api/registrar/get-registrars', {
+      const registrarsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/registrar/get-registrars`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -172,7 +172,7 @@ const AdminDashboard = ({ onLogout }) => {
       // Fallback: try to fetch just universities without contact
       try {
         const token = localStorage.getItem('auth_token') || `admin_mock_token_${Date.now()}`;
-        const fallbackResponse = await fetch('http://localhost:5000/api/admin/universities/all', {
+        const fallbackResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/universities/all`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -197,7 +197,7 @@ const AdminDashboard = ({ onLogout }) => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('auth_token') || '';
-      const response = await fetch('http://localhost:5000/api/course-categories', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-categories`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -224,7 +224,7 @@ const AdminDashboard = ({ onLogout }) => {
       console.log('🔄 Fetching dashboard stats...');
 
       // Fetch total users count
-      const usersResponse = await fetch('http://localhost:5000/api/admin/stats/users', {
+      const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -232,7 +232,7 @@ const AdminDashboard = ({ onLogout }) => {
       });
 
       // Fetch total courses count
-      const coursesResponse = await fetch('http://localhost:5000/api/admin/stats/courses', {
+      const coursesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats/courses`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -240,7 +240,7 @@ const AdminDashboard = ({ onLogout }) => {
       });
 
       // Fetch total revenue
-      const revenueResponse = await fetch('http://localhost:5000/api/admin/stats/revenue', {
+      const revenueResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats/revenue`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -248,7 +248,7 @@ const AdminDashboard = ({ onLogout }) => {
       });
 
       // Fetch pending approvals (universities)
-      const approvalsResponse = await fetch('http://localhost:5000/api/admin/universities/all', {
+      const approvalsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/universities/all`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -327,7 +327,7 @@ const AdminDashboard = ({ onLogout }) => {
 
       console.log('🔄 Fetching sessions from /api/admin/sessions...');
 
-      const response = await fetch('http://localhost:5000/api/admin/sessions', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/sessions`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -406,7 +406,7 @@ const AdminDashboard = ({ onLogout }) => {
 
       console.log('🔄 Fetching users from /api/admin/users...');
 
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -443,7 +443,7 @@ const AdminDashboard = ({ onLogout }) => {
       const token = localStorage.getItem('auth_token') || '';
 
       // Fetch users for growth chart
-      const usersResponse = await fetch('http://localhost:5000/api/admin/users', {
+      const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const usersResult = await usersResponse.json();
@@ -508,7 +508,7 @@ const AdminDashboard = ({ onLogout }) => {
       const token = localStorage.getItem('auth_token') || '';
 
       // Fetch courses for top courses chart
-      const coursesResponse = await fetch('http://localhost:5000/api/admin/courses', {
+      const coursesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/courses`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const coursesResult = await coursesResponse.json();
@@ -535,7 +535,7 @@ const AdminDashboard = ({ onLogout }) => {
       }
 
       // Fetch payments for payment methods distribution
-      const paymentsResponse = await fetch('http://localhost:5000/api/admin/payments', {
+      const paymentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/payments`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const paymentsResult = await paymentsResponse.json();
@@ -581,7 +581,7 @@ const AdminDashboard = ({ onLogout }) => {
       }
 
       // Fetch users for engagement funnel
-      const usersResponse = await fetch('http://localhost:5000/api/admin/users', {
+      const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const usersResult = await usersResponse.json();
@@ -715,7 +715,7 @@ const AdminDashboard = ({ onLogout }) => {
       const token = localStorage.getItem('auth_token') || '';
 
       // Fetch Quizzes
-      const quizResponse = await fetch('http://localhost:5000/api/quiz/all/list', {
+      const quizResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/quiz/all/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -724,7 +724,7 @@ const AdminDashboard = ({ onLogout }) => {
       const quizResult = await quizResponse.json();
 
       // Fetch Attempts
-      const attemptResponse = await fetch('http://localhost:5000/api/quiz/attempts/all/list', {
+      const attemptResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/quiz/attempts/all/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -733,7 +733,7 @@ const AdminDashboard = ({ onLogout }) => {
       const attemptResult = await attemptResponse.json();
 
       // Fetch Certificates
-      const certResponse = await fetch('http://localhost:5000/api/certification/all/list', {
+      const certResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/certification/all/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -863,7 +863,7 @@ const AdminDashboard = ({ onLogout }) => {
 
     try {
       const token = localStorage.getItem('auth_token') || '';
-      const response = await fetch(`http://localhost:5000/api/admin/users/${deleteConfirm._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${deleteConfirm._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -891,7 +891,7 @@ const AdminDashboard = ({ onLogout }) => {
 
     try {
       const token = localStorage.getItem('auth_token') || '';
-      const response = await fetch(`http://localhost:5000/api/admin/users/${editingUser._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${editingUser._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -934,7 +934,7 @@ const AdminDashboard = ({ onLogout }) => {
       // Use stored token if present else fallback to mock admin token accepted by backend
       const token = localStorage.getItem('auth_token') || `admin_mock_token_${Date.now()}`;
 
-      const response = await fetch(`http://localhost:5000/api/admin/universities/${universityId}/approve`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/universities/${universityId}/approve`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -970,7 +970,7 @@ const AdminDashboard = ({ onLogout }) => {
       // Use stored token if present else fallback to mock admin token accepted by backend
       const token = localStorage.getItem('auth_token') || `admin_mock_token_${Date.now()}`;
 
-      const response = await fetch(`http://localhost:5000/api/admin/universities/${universityId}/reject`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/universities/${universityId}/reject`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1004,7 +1004,7 @@ const AdminDashboard = ({ onLogout }) => {
   const fetchCourses = async () => {
     try {
       setCoursesLoading(true);
-      const response = await fetch('http://localhost:5000/api/tbl-courses');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses`);
       const result = await response.json();
 
       console.log('Courses API Response:', result);
@@ -1038,7 +1038,7 @@ const AdminDashboard = ({ onLogout }) => {
   // Fetch course categories for mapping
   const fetchCourseCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/course-categories');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-categories`);
       const result = await response.json();
       if (result.success && result.data) {
         setCourseCategories(result.data);
@@ -1051,7 +1051,7 @@ const AdminDashboard = ({ onLogout }) => {
   // Course Management Handlers
   const handleApproveCourse = async (courseId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tbl-courses/${courseId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1077,7 +1077,7 @@ const AdminDashboard = ({ onLogout }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/tbl-courses/${courseId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tbl-courses/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1113,7 +1113,7 @@ const AdminDashboard = ({ onLogout }) => {
 
       console.log('📝 Fetching feedback from backend...');
 
-      const response = await fetch('http://localhost:5000/api/admin/feedback', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -1167,7 +1167,7 @@ const AdminDashboard = ({ onLogout }) => {
     if (!newCategory.trim()) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/course-categories', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1200,7 +1200,7 @@ const AdminDashboard = ({ onLogout }) => {
     if (!editCategoryName.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/course-categories/${editingCategory._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-categories/${editingCategory._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1238,7 +1238,7 @@ const AdminDashboard = ({ onLogout }) => {
     if (!confirmData) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/course-categories/${confirmData}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/course-categories/${confirmData}`, {
         method: 'DELETE',
       });
 
@@ -1278,7 +1278,7 @@ const AdminDashboard = ({ onLogout }) => {
 
       console.log('💳 Fetching payments from /api/admin/payments...');
 
-      const response = await fetch('http://localhost:5000/api/admin/payments', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/payments`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1373,7 +1373,7 @@ const AdminDashboard = ({ onLogout }) => {
   // Action handlers for Feedback Management
   const handleApproveFeedback = async (feedbackId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/feedback/${feedbackId}/approve`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback/${feedbackId}/approve`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1410,7 +1410,7 @@ const AdminDashboard = ({ onLogout }) => {
 
   const confirmRejectFeedback = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/feedback/${selectedFeedback.Feedback_Id}/reject`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback/${selectedFeedback.Feedback_Id}/reject`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1459,7 +1459,7 @@ const AdminDashboard = ({ onLogout }) => {
     if (!confirmData) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/feedback/${confirmData}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback/${confirmData}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -1491,7 +1491,7 @@ const AdminDashboard = ({ onLogout }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/feedback/${selectedFeedback.Feedback_Id}/respond`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/feedback/${selectedFeedback.Feedback_Id}/respond`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1582,7 +1582,7 @@ const AdminDashboard = ({ onLogout }) => {
       setChatLoading(true);
 
       // Fetch chat statistics
-      const statsResponse = await fetch('http://localhost:5000/api/chat-history/stats/overview');
+      const statsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/chat-history/stats/overview`);
       const statsData = await statsResponse.json();
 
       if (statsData.success) {
@@ -1595,7 +1595,7 @@ const AdminDashboard = ({ onLogout }) => {
       }
 
       // Fetch chat history
-      const historyResponse = await fetch(`http://localhost:5000/api/chat-history/all?limit=10&page=${chatPage}`);
+      const historyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/chat-history/all?limit=10&page=${chatPage}`);
       const historyData = await historyResponse.json();
 
       if (historyData.success) {
@@ -1621,7 +1621,7 @@ const AdminDashboard = ({ onLogout }) => {
   const confirmDeleteChatEntry = async () => {
     if (deletingChatId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/chat-history/${deletingChatId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat-history/${deletingChatId}`, {
           method: 'DELETE'
         });
         const data = await response.json();
