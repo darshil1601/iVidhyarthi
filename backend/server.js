@@ -35,7 +35,21 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
 /* ============================
    Middlewares
    ============================ */
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://ividhyarthi-frontend.onrender.com",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// Explicitly handle preflight
+app.options("*", cors());
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
