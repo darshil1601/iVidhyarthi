@@ -460,21 +460,24 @@ app.post("/send-otp", async (req, res, next) => {
     console.log("📮 Attempting to send email to:", email.trim());
 
     // Respond immediately to the client, then send email asynchronously
-    res.json({ success: true, message: "OTP sent successfully" });
+    res.json({
+      success: true,
+      message: "OTP generated (email delivery may be delayed)",
+    });
 
-    transporter
-      .sendMail(mailOptions)
-      .then((info) => {
+    (async () => {
+      try {
+        const info = await transporter.sendMail(mailOptions);
         console.log("✅ OTP email sent successfully!", info.messageId);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("❌ Error sending OTP mail:", err);
         console.error("Error details:", {
           message: err.message,
           code: err.code,
           command: err.command,
         });
-      });
+      }
+    })();
   } catch (err) {
     console.error("❌ Unexpected error in send-otp:", err);
     next(err);
