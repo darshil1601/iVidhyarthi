@@ -459,25 +459,31 @@ app.post("/send-otp", async (req, res, next) => {
 
     console.log("📮 Attempting to send email to:", email.trim());
 
-    // Respond immediately to the client, then send email asynchronously
-    res.json({
-      success: true,
-      message: "OTP generated (email delivery may be delayed)",
-    });
+    // Attempt to send the email but never let the request hang:
+    // Use a short Promise.race timeout so we respond quickly if SMTP is slow/unreachable.
+    // If sendMail succeeds within timeout -> return success; if it fails or times out -> return error.
+    const EMAIL_SEND_TIMEOUT_MS = 5000; // safe short timeout for Render environment
 
-    (async () => {
-      try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ OTP email sent successfully!", info.messageId);
-      } catch (err) {
-        console.error("❌ Error sending OTP mail:", err);
-        console.error("Error details:", {
-          message: err.message,
-          code: err.code,
-          command: err.command,
-        });
-      }
-    })();
+    const mailPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SMTP timeout')), EMAIL_SEND_TIMEOUT_MS),
+    );
+
+    try {
+      const info = await Promise.race([mailPromise, timeoutPromise]);
+      // Email sent successfully within timeout
+      console.log('✅ OTP email sent successfully!', info && info.messageId);
+      return res.json({ success: true, message: 'OTP sent successfully' });
+    } catch (err) {
+      // Log failure clearly and return an error response quickly.
+      console.error('❌ Error sending OTP mail or timeout:', err);
+      console.error('⚠️ OTP generated but email delivery failed or timed out');
+      return res.status(502).json({
+        success: false,
+        message: 'OTP generated but email delivery failed or timed out',
+        error: err && err.message,
+      });
+    }
   } catch (err) {
     console.error("❌ Unexpected error in send-otp:", err);
     next(err);
