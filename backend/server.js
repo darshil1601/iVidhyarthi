@@ -123,6 +123,10 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+  // Safe timeouts to avoid long blocking waits
+  connectionTimeout: 10000,
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
 });
 
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
@@ -455,23 +459,22 @@ app.post("/send-otp", async (req, res, next) => {
 
     console.log("📮 Attempting to send email to:", email.trim());
 
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
+    // Respond immediately to the client, then send email asynchronously
+    res.json({ success: true, message: "OTP sent successfully" });
+
+    transporter
+      .sendMail(mailOptions)
+      .then((info) => {
+        console.log("✅ OTP email sent successfully!", info.messageId);
+      })
+      .catch((err) => {
         console.error("❌ Error sending OTP mail:", err);
         console.error("Error details:", {
           message: err.message,
           code: err.code,
           command: err.command,
         });
-        return res.status(500).json({
-          success: false,
-          message: "Could not send OTP. Please check email configuration.",
-          error: err.message,
-        });
-      }
-      console.log("✅ OTP email sent successfully!", info.messageId);
-      return res.json({ success: true, message: "OTP sent successfully" });
-    });
+      });
   } catch (err) {
     console.error("❌ Unexpected error in send-otp:", err);
     next(err);
